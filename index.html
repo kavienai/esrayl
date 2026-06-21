@@ -30,8 +30,8 @@ body {
   font-family: var(--font);
   background: var(--bg);
   color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* ── HEADER ── */
@@ -42,8 +42,7 @@ body {
   display: flex;
   align-items: center;
   gap: 16px;
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 100;
   backdrop-filter: blur(10px);
 }
@@ -101,7 +100,11 @@ body {
 .tab-icon { margin-right: 6px; }
 
 /* ── MAIN LAYOUT ── */
-.app-body { display: flex; height: calc(100vh - 115px); overflow: hidden; }
+.app-body { 
+  display: flex; 
+  height: calc(100vh - 118px); 
+  overflow: hidden; 
+}
 .tab-panel { display: none; width: 100%; height: 100%; overflow: hidden; }
 .tab-panel.active { display: flex; }
 
@@ -365,6 +368,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0;
+  max-height: 100%; /* Taşmayı engelleyen kritik düzeltme */
 }
 
 .jury-bar {
@@ -376,6 +380,7 @@ body {
   border-radius: var(--radius);
   padding: 12px 16px;
   margin-bottom: 20px;
+  flex-shrink: 0; /* Küçülmesini önleyerek başlığı sabit tutar */
 }
 .jury-dots {
   display: flex;
@@ -403,6 +408,7 @@ body {
   margin-bottom: 12px;
   overflow: hidden;
   transition: border-color 0.2s;
+  flex-shrink: 0; /* İçeriğin dikeyde ezilmesini önler */
 }
 .soru-card:hover { border-color: var(--blue-dim); }
 .soru-header {
@@ -532,6 +538,7 @@ body {
   flex: 1;
   overflow-y: auto;
   padding: 24px;
+  max-height: 100%; /* Taşmayı engelleyen kritik düzeltme */
 }
 
 .soru-bilim {
@@ -542,6 +549,7 @@ body {
   overflow: hidden;
   cursor: pointer;
   transition: border-color 0.2s;
+  flex-shrink: 0;
 }
 .soru-bilim:hover { border-color: var(--blue-dim); }
 .soru-bilim.open { border-color: var(--blue); }
@@ -588,9 +596,10 @@ body {
 }
 
 /* scrollbar */
-::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: var(--surface2); border-radius: 3px; border: 1px solid var(--border); }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
 
 /* section divider */
 .sec-divider {
@@ -604,7 +613,7 @@ body {
 }
 
 /* progress bar */
-.prog-bar-wrap { margin-bottom: 20px; }
+.prog-bar-wrap { margin-bottom: 20px; flex-shrink: 0; }
 .prog-bar-label { font-size: 11px; color: var(--text-muted); margin-bottom: 6px; }
 .prog-bar { height: 3px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
 .prog-bar-fill { height: 100%; background: linear-gradient(90deg, var(--blue), var(--gold)); border-radius: 3px; transition: width 0.3s; }
@@ -623,9 +632,10 @@ body {
 .empty-text { font-size: 14px; }
 
 @media (max-width: 680px) {
-  .prog-sidebar, .sim-left, .bilim-sidebar { width: 180px; }
+  .prog-sidebar, .sim-left, .bilim-sidebar { width: 140px; }
   .hoca-grid { grid-template-columns: 1fr; }
   .prog-content, .sim-main, .bilim-main { padding: 14px; }
+  .app-body { height: calc(100vh - 150px); } /* Mobilde çift satırlı navigasyon ihtimali için esneklik */
 }
 </style>
 </head>
@@ -654,7 +664,6 @@ body {
 
 <div class="app-body">
 
-<!-- ══════ PANEL 1: PROGRAMLAR ══════ -->
 <div id="tab-programlar" class="tab-panel active">
   <div class="prog-sidebar">
     <div class="sec-divider">GSÜ</div>
@@ -682,69 +691,67 @@ body {
   </div>
 
   <div class="prog-content" id="prog-content">
-    <!-- dynamically rendered -->
-  </div>
-</div>
-
-<!-- ══════ PANEL 2: MÜLAKAT ══════ -->
-<div id="tab-mulakat" class="tab-panel">
-  <div class="sim-left">
-    <h3>Program</h3>
-    <button class="sim-prog-btn active" onclick="simSetProg('itu-isletme', this)">İTÜ İşletme Müh.</button>
-    <button class="sim-prog-btn" onclick="simSetProg('itu-em', this)">İTÜ Endüstri Müh.</button>
-    <button class="sim-prog-btn" onclick="simSetProg('itu-my', this)">İTÜ Müh. Yönetimi</button>
-    <button class="sim-prog-btn" onclick="simSetProg('gsu-isletme', this)">GSÜ İşletme</button>
-    <button class="sim-prog-btn" onclick="simSetProg('gsu-em', this)">GSÜ Endüstri Müh.</button>
-
-    <div class="sec-divider" style="margin-top:12px">Soru Tipi</div>
-    <div class="sim-type-group">
-      <button class="sim-type-btn active" onclick="simSetTip('hepsi', this)">🔀 Tümü</button>
-      <button class="sim-type-btn" onclick="simSetTip('motivasyon', this)">💚 Motivasyon</button>
-      <button class="sim-type-btn" onclick="simSetTip('teknik', this)">🔴 Teknik</button>
-      <button class="sim-type-btn" onclick="simSetTip('stres', this)">🟠 Stres</button>
-      <button class="sim-type-btn" onclick="simSetTip('genel', this)">🔵 Genel</button>
     </div>
-  </div>
+</div>
 
-  <div class="sim-main" id="sim-main">
-    <!-- dynamically rendered -->
+<div id="tab-mulakat" class="tab-panel">
+  <div class="sim-layout">
+    <div class="sim-left">
+      <h3>Program</h3>
+      <button class="sim-prog-btn active" onclick="simSetProg('itu-isletme', this)">İTÜ İşletme Müh.</button>
+      <button class="sim-prog-btn" onclick="simSetProg('itu-em', this)">İTÜ Endüstri Müh.</button>
+      <button class="sim-prog-btn" onclick="simSetProg('itu-my', this)">İTÜ Müh. Yönetimi</button>
+      <button class="sim-prog-btn" onclick="simSetProg('gsu-isletme', this)">GSÜ İşletme</button>
+      <button class="sim-prog-btn" onclick="simSetProg('gsu-em', this)">GSÜ Endüstri Müh.</button>
+
+      <div class="sec-divider" style="margin-top:12px">Soru Tipi</div>
+      <div class="sim-type-group">
+        <button class="sim-type-btn active" onclick="simSetTip('hepsi', this)">🔀 Tümü</button>
+        <button class="sim-type-btn" onclick="simSetTip('motivasyon', this)">💚 Motivasyon</button>
+        <button class="sim-type-btn" onclick="simSetTip('teknik', this)">🔴 Teknik</button>
+        <button class="sim-type-btn" onclick="simSetTip('stres', this)">🟠 Stres</button>
+        <button class="sim-type-btn" onclick="simSetTip('genel', this)">🔵 Genel</button>
+      </div>
+    </div>
+
+    <div class="sim-main" id="sim-main">
+      </div>
   </div>
 </div>
 
-<!-- ══════ PANEL 3: BİLİMSEL ══════ -->
 <div id="tab-bilimsel" class="tab-panel">
-  <div class="bilim-sidebar">
-    <div class="sec-divider">Temel</div>
-    <button class="konu-btn active" onclick="showKonu('istatistik', this)">
-      <span class="konu-icon">📊</span>İstatistik & Analiz
-    </button>
-    <button class="konu-btn" onclick="showKonu('mcdm', this)">
-      <span class="konu-icon">⚖️</span>MCDM Yöntemleri
-    </button>
-    <button class="konu-btn" onclick="showKonu('ml', this)">
-      <span class="konu-icon">🤖</span>Makine Öğrenmesi
-    </button>
-    <div class="sec-divider">Alan</div>
-    <button class="konu-btn" onclick="showKonu('pazarlama', this)">
-      <span class="konu-icon">📣</span>Pazarlama Teorisi
-    </button>
-    <button class="konu-btn" onclick="showKonu('oyun', this)">
-      <span class="konu-icon">♟️</span>Oyun Teorisi
-    </button>
-    <button class="konu-btn" onclick="showKonu('crm', this)">
-      <span class="konu-icon">🔗</span>CRM & Büyüme
-    </button>
-    <div class="sec-divider">Yöntem</div>
-    <button class="konu-btn" onclick="showKonu('arastirma', this)">
-      <span class="konu-icon">🔍</span>Araştırma Metodolojisi
-    </button>
-  </div>
-  <div class="bilim-main" id="bilim-main">
-    <!-- dynamically rendered -->
+  <div class="bilim-layout">
+    <div class="bilim-sidebar">
+      <div class="sec-divider">Temel</div>
+      <button class="konu-btn active" onclick="showKonu('istatistik', this)">
+        <span class="konu-icon">📊</span>İstatistik & Analiz
+      </button>
+      <button class="konu-btn" onclick="showKonu('mcdm', this)">
+        <span class="konu-icon">⚖️</span>MCDM Yöntemleri
+      </button>
+      <button class="konu-btn" onclick="showKonu('ml', this)">
+        <span class="konu-icon">🤖</span>Makine Öğrenmesi
+      </button>
+      <div class="sec-divider">Alan</div>
+      <button class="konu-btn" onclick="showKonu('pazarlama', this)">
+        <span class="konu-icon">📣</span>Pazarlama Teorisi
+      </button>
+      <button class="konu-btn" onclick="showKonu('oyun', this)">
+        <span class="konu-icon">♟️</span>Oyun Teorisi
+      </button>
+      <button class="konu-btn" onclick="showKonu('crm', this)">
+        <span class="konu-icon">🔗</span>CRM & Büyüme
+      </button>
+      <div class="sec-divider">Yöntem</div>
+      <button class="konu-btn" onclick="showKonu('arastirma', this)">
+        <span class="konu-icon">🔍</span>Araştırma Metodolojisi
+      </button>
+    </div>
+
+    <div class="bilim-main" id="bilim-main">
+      </div>
   </div>
 </div>
-
-</div><!-- app-body -->
 
 <script>
 /* ══════════════════════════════════
